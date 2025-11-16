@@ -1,0 +1,288 @@
+body {
+  margin: 0;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.glossy-header {
+  background-color: #ee6b0e; /* Header background color */
+  color: #fff; /* Text color */
+  text-align: center;
+  padding: 20px;
+  z-index:2;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-shadow: 1px 1px 0 ; /* Shadow for glossy effect */
+}
+
+.glossy-header h1 {
+  margin: 0;
+  font-size: 45px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+
+}
+
+.navbar {
+  background-color: #3f4347; /* Navbar background color */
+  text-align: center;
+  padding: 10px 0;
+}
+
+.nav-item {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 24px;
+  padding: 15px;
+  text-transform: uppercase;
+}
+
+
+
+/* Change background color on hover and click */
+#stock:hover, #stock-section:hover {
+  background-color: #10cd72;
+  cursor: pointer;
+}
+#sell:hover, #sell-section:hover {
+  background-color: #e74c3c;
+  cursor: pointer;
+}
+
+.horizontal-div {
+  text-align: center;
+}
+
+.horizontal-div {
+  display: inline-block;
+  width: 600px;
+  height: 500px;
+  margin: 40px;
+  line-height: 300px;
+  color: rgb(240, 234, 234);
+  font-size: 20px;
+}
+
+#combined-chart-container {
+  display: flex; /* or any appropriate display style */
+}
+
+/* ...existing CSS... */
+
+.inventory-form,
+.fund-form {
+  width: 75%;
+  margin: 20px auto;
+  padding: 20px;
+  font-size: 30px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fund-form h2 {
+  text-align: center;
+  color: #ee6b0e;
+  margin-bottom: 20px;
+  font-size: 35px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ee6b0e;
+}
+
+input[type="date"],
+input[type="text"],
+input[type="number"],
+input[type="submit"] {
+  width: calc(100% - 12px);
+  padding: 6px;
+  border:  solid #1b1a1a;
+  border-radius: 3px;
+  font-size:30px;
+}
+
+/* ...existing CSS... */
+
+.buttons {
+  text-align: center;
+  margin:80px 0;
+  border-radius: 40%;
+}
+
+.action-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 0 10px;
+  font-size: 30px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: #ee6b0e;
+  color: #fff;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+a:hover{
+  color: #65625d;
+}
+.action-button:hover {
+  background-color: #3c3b4a;
+}
+
+/* Fund form submit button */
+.submit-btn {
+  background-color: #ee6b0e;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #d45a0a;
+}
+
+/* Table styles */
+.table-container {
+  width: 95%;
+  margin: 20px auto;
+  overflow-x: auto;
+}
+
+.fund-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 18px;
+}
+
+.fund-table thead {
+  background-color: #ee6b0e;
+  color: #fff;
+}
+
+.fund-table th,
+.fund-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.fund-table th {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 16px;
+}
+
+.fund-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.fund-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Action buttons in table */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.edit-btn {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+.edit-btn:hover {
+  background-color: #45a049;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background-color: #da190b;
+}
+
+/* Existing CSS */
+
+/* Apply responsive design for smaller screens */
+@media only screen and (max-width: 768px) {
+  .content {
+    display: flex;
+    flex-direction: column;
+  }
+  .section {
+    height: auto;
+    padding-top: 20px;
+  }
+  .horizontal-div {
+    width: 90%;
+    margin: 20px auto;
+  }
+  .inventory-form,
+  .fund-form {
+    width: 90%;
+  }
+  
+  .table-container {
+    width: 100%;
+  }
+  
+  .fund-table {
+    font-size: 14px;
+  }
+  
+  .fund-table th,
+  .fund-table td {
+    padding: 8px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .edit-btn,
+  .delete-btn {
+    width: 100%;
+    font-size: 12px;
+  }
+  .buttons {
+    margin-top: 10px;
+  }
+  input[type="date"],
+  input[type="text"],
+  input[type="number"],
+  input[type="submit"] {
+    width: 100%;
+  }
+}
+
+
