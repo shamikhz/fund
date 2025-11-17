@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=0.5">
+    <meta http-equiv="refresh" content="0; url=fund.html">
 
   <title>Masjid fund</title>
   <link rel="stylesheet" href="index.css">
@@ -16,11 +17,20 @@
     <h1>Taamir-e-Masjid Fund</h1>
   </header>
     <nav class="navbar">
-    <div class="nav-item" id="fund"><a href="fund.html">Collection</a></div>
+    <div class="nav-item"><a href="fund.html">Home</a></div>
+    <div class="nav-item"><a href="index.html">Submit Fund</a></div>
   </nav>
     <div class="container">
     <form class="fund-form" id="fund-form">
       <h2>Submit Fund Contribution</h2>
+      <div class="lock-panel">
+        <label for="form-password">Enter password to unlock form</label>
+        <div class="lock-controls">
+          <input type="password" id="form-password" placeholder="Password">
+          <button type="button" id="unlock-form-btn" class="lock-btn">Unlock</button>
+        </div>
+        <p class="lock-status" id="form-lock-status">Form is locked.</p>
+      </div>
       <div class="form-group">
         <label for="donor-name">Donor Name:</label>
         <input type="text" id="donor-name" name="donorName" required>
@@ -38,7 +48,7 @@
         <input type="text" id="description" name="description">
       </div>
       <div class="form-group">
-        <input type="submit" value="Submit Fund" class="submit-btn">
+        <input type="submit" value="Submit Fund" class="submit-btn" id="submit-btn" disabled>
       </div>
     </form>
     <script src="index.js"></script>

@@ -1,12 +1,56 @@
+const ACCESS_PASSWORD = 'fundLock@123';
+let actionsUnlocked = false;
+
 // Display all fund records in the table
 document.addEventListener('DOMContentLoaded', function() {
+  setupActionsLock();
   loadFundsTable();
 });
+
+function setupActionsLock() {
+  const passwordInput = document.getElementById('actions-password');
+  const unlockBtn = document.getElementById('unlock-actions-btn');
+  const lockStatus = document.getElementById('actions-lock-status');
+
+  if (!passwordInput || !unlockBtn) {
+    return;
+  }
+
+  function updateStatus(message, isError = false) {
+    if (!lockStatus) return;
+    lockStatus.textContent = message;
+    lockStatus.classList.toggle('error', isError);
+    lockStatus.classList.toggle('unlocked', !isError && actionsUnlocked);
+  }
+
+  function tryUnlock() {
+    if (passwordInput.value === ACCESS_PASSWORD) {
+      actionsUnlocked = true;
+      passwordInput.value = '';
+      passwordInput.disabled = true;
+      unlockBtn.disabled = true;
+      updateStatus('Actions unlocked. You can edit or delete entries now.');
+      loadFundsTable();
+    } else {
+      updateStatus('Incorrect password. Actions remain locked.', true);
+    }
+  }
+
+  unlockBtn.addEventListener('click', tryUnlock);
+  passwordInput.addEventListener('keyup', function(event) {
+    if (event.key === 'Enter') {
+      tryUnlock();
+    }
+  });
+}
 
 function loadFundsTable() {
   const funds = JSON.parse(localStorage.getItem('funds')) || [];
   const tableBody = document.getElementById('fund-table-body');
   const noDataMessage = document.getElementById('no-data-message');
+  
+  // Update total summary
+  updateTotalFund(funds);
   
   // Clear existing rows
   tableBody.innerHTML = '';
@@ -24,17 +68,19 @@ function loadFundsTable() {
     noDataMessage.style.display = 'none';
   }
   
+  const lockAttributes = actionsUnlocked ? '' : 'disabled title="Enter password to unlock actions"';
+
   // Populate table with fund data
   funds.forEach(function(fund) {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${escapeHtml(fund.donorName)}</td>
-      <td>${fund.amount.toFixed(2)}</td>
+      <td>${formatCurrency(fund.amount)}</td>
       <td>${formatDate(fund.date)}</td>
       <td>${escapeHtml(fund.description)}</td>
       <td class="action-buttons">
-        <button class="edit-btn" onclick="editFund(${fund.id})">Edit</button>
-        <button class="delete-btn" onclick="deleteFund(${fund.id})">Delete</button>
+        <button class="edit-btn" onclick="editFund(${fund.id})" ${lockAttributes}>Edit</button>
+        <button class="delete-btn" onclick="deleteFund(${fund.id})" ${lockAttributes}>Delete</button>
       </td>
     `;
     tableBody.appendChild(row);
@@ -42,6 +88,10 @@ function loadFundsTable() {
 }
 
 function editFund(id) {
+  if (!actionsUnlocked) {
+    alert('Please unlock the actions with the password before editing.');
+    return;
+  }
   const funds = JSON.parse(localStorage.getItem('funds')) || [];
   const fund = funds.find(f => f.id === id);
   
@@ -85,6 +135,10 @@ function editFund(id) {
 }
 
 function deleteFund(id) {
+  if (!actionsUnlocked) {
+    alert('Please unlock the actions with the password before deleting.');
+    return;
+  }
   if (!confirm('Are you sure you want to delete this fund record?')) {
     return;
   }
@@ -121,5 +175,26 @@ function formatDate(dateString) {
     month: 'short', 
     day: 'numeric' 
   });
+}
+
+function formatCurrency(amount) {
+  const value = parseFloat(amount) || 0;
+  return value.toLocaleString('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2
+  });
+}
+
+function updateTotalFund(funds) {
+  const totalAmountElement = document.getElementById('total-amount');
+  if (!totalAmountElement) {
+    return;
+  }
+  const total = funds.reduce((sum, fund) => {
+    const value = parseFloat(fund.amount);
+    return sum + (isNaN(value) ? 0 : value);
+  }, 0);
+  totalAmountElement.textContent = formatCurrency(total);
 }
 

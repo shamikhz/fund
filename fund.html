@@ -13,9 +13,21 @@
     <h1>Taamir-e-Masjid Fund</h1>
   </header>
   <nav class="navbar">
-    <div class="nav-item"><a href="index.html">Home</a></div>
-    <div class="nav-item" id="fund"><a href="fund.html">Collection</a></div>
+    <div class="nav-item" id="fund"><a href="fund.html">Home</a></div>
+    <div class="nav-item"><a href="index.html">Submit Fund</a></div>
   </nav>
+  <div class="total-summary">
+    <div class="total-title">Total Fund</div>
+    <div id="total-amount" class="total-amount">₹0.00</div>
+  </div>
+  <div class="lock-panel">
+    <label for="actions-password">Enter password to unlock actions</label>
+    <div class="lock-controls">
+      <input type="password" id="actions-password" placeholder="Password">
+      <button type="button" id="unlock-actions-btn" class="lock-btn">Unlock</button>
+    </div>
+    <p class="lock-status" id="actions-lock-status">Actions are locked.</p>
+  </div>
   <div class="container">
     <h2 style="text-align: center; color: #ee6b0e; margin: 20px 0;">Fund Collection Records</h2>
     <div class="table-container">
