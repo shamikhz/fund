@@ -1,5 +1,21 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getFirestore, collection, getDocs, updateDoc, deleteDoc, doc, orderBy, query } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCrInzMyfWuDBxSK3SVGJq1gilxb4Z6Tfw",
+  authDomain: "fund-c9c9e.firebaseapp.com",
+  projectId: "fund-c9c9e",
+  storageBucket: "fund-c9c9e.firebasestorage.app",
+  messagingSenderId: "293603215710",
+  appId: "1:293603215710:web:b23d190fdd60e2d52527cf"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const fundsCollection = collection(db, 'funds');
 const ACCESS_PASSWORD = 'fundLock@123';
 let actionsUnlocked = false;
+let fundsCache = [];
 
 // Display all fund records in the table
 document.addEventListener('DOMContentLoaded', function() {
@@ -23,14 +39,14 @@ function setupActionsLock() {
     lockStatus.classList.toggle('unlocked', !isError && actionsUnlocked);
   }
 
-  function tryUnlock() {
+  async function tryUnlock() {
     if (passwordInput.value === ACCESS_PASSWORD) {
       actionsUnlocked = true;
       passwordInput.value = '';
       passwordInput.disabled = true;
       unlockBtn.disabled = true;
       updateStatus('Actions unlocked. You can edit or delete entries now.');
-      loadFundsTable();
+      await loadFundsTable();
     } else {
       updateStatus('Incorrect password. Actions remain locked.', true);
     }
@@ -44,97 +60,109 @@ function setupActionsLock() {
   });
 }
 
-function loadFundsTable() {
-  const funds = JSON.parse(localStorage.getItem('funds')) || [];
+async function loadFundsTable() {
   const tableBody = document.getElementById('fund-table-body');
   const noDataMessage = document.getElementById('no-data-message');
   
-  // Update total summary
-  updateTotalFund(funds);
-  
-  // Clear existing rows
-  tableBody.innerHTML = '';
-  
-  if (funds.length === 0) {
-    // Show no data message
+  if (!tableBody) {
+    return;
+  }
+
+  tableBody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+
+  try {
+    const fundsQuery = query(fundsCollection, orderBy('date', 'desc'));
+    const snapshot = await getDocs(fundsQuery);
+    fundsCache = snapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+
+    updateTotalFund(fundsCache);
+    tableBody.innerHTML = '';
+
+    if (fundsCache.length === 0) {
+      if (noDataMessage) {
+        noDataMessage.style.display = 'block';
+      }
+      return;
+    }
+
+    if (noDataMessage) {
+      noDataMessage.style.display = 'none';
+    }
+
+    const lockAttributes = actionsUnlocked ? '' : 'disabled title="Enter password to unlock actions"';
+
+    fundsCache.forEach(function(fund) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${escapeHtml(fund.donorName || '')}</td>
+        <td>${formatCurrency(fund.amount)}</td>
+        <td>${formatDate(fund.date)}</td>
+        <td>${escapeHtml(fund.description || '')}</td>
+        <td class="action-buttons">
+          <button class="edit-btn" onclick="editFund('${fund.id}')" ${lockAttributes}>Edit</button>
+          <button class="delete-btn" onclick="deleteFund('${fund.id}')" ${lockAttributes}>Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  } catch (error) {
+    console.error('Error loading funds:', error);
+    tableBody.innerHTML = '<tr><td colspan="5">Failed to load funds. Please refresh.</td></tr>';
     if (noDataMessage) {
       noDataMessage.style.display = 'block';
     }
-    return;
   }
-  
-  // Hide no data message
-  if (noDataMessage) {
-    noDataMessage.style.display = 'none';
-  }
-  
-  const lockAttributes = actionsUnlocked ? '' : 'disabled title="Enter password to unlock actions"';
-
-  // Populate table with fund data
-  funds.forEach(function(fund) {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${escapeHtml(fund.donorName)}</td>
-      <td>${formatCurrency(fund.amount)}</td>
-      <td>${formatDate(fund.date)}</td>
-      <td>${escapeHtml(fund.description)}</td>
-      <td class="action-buttons">
-        <button class="edit-btn" onclick="editFund(${fund.id})" ${lockAttributes}>Edit</button>
-        <button class="delete-btn" onclick="deleteFund(${fund.id})" ${lockAttributes}>Delete</button>
-      </td>
-    `;
-    tableBody.appendChild(row);
-  });
 }
 
-function editFund(id) {
+async function editFund(id) {
   if (!actionsUnlocked) {
     alert('Please unlock the actions with the password before editing.');
     return;
   }
-  const funds = JSON.parse(localStorage.getItem('funds')) || [];
-  const fund = funds.find(f => f.id === id);
+  const fund = fundsCache.find(f => f.id === id);
   
   if (!fund) {
     alert('Fund record not found.');
     return;
   }
   
-  // Prompt for new values
-  const newDonorName = prompt('Enter donor name:', fund.donorName);
-  if (newDonorName === null) return; // User cancelled
+  const newDonorName = prompt('Enter donor name:', fund.donorName || '');
+  if (newDonorName === null) return;
   
   const newAmount = prompt('Enter amount:', fund.amount);
-  if (newAmount === null) return; // User cancelled
+  if (newAmount === null) return;
   
   const newDate = prompt('Enter date (YYYY-MM-DD):', fund.date);
-  if (newDate === null) return; // User cancelled
+  if (newDate === null) return;
   
-  const newDescription = prompt('Enter description:', fund.description);
-  if (newDescription === null) return; // User cancelled
+  const newDescription = prompt('Enter description:', fund.description || '');
+  if (newDescription === null) return;
   
-  // Validate
   if (!newDonorName.trim() || !newAmount || !newDate) {
     alert('Please fill in all required fields.');
     return;
   }
   
-  // Update fund
-  fund.donorName = newDonorName.trim();
-  fund.amount = parseFloat(newAmount);
-  fund.date = newDate;
-  fund.description = newDescription.trim() || 'N/A';
-  
-  // Save back to localStorage
-  localStorage.setItem('funds', JSON.stringify(funds));
-  
-  // Reload table
-  loadFundsTable();
-  
-  alert('Fund record updated successfully!');
+  try {
+    const fundRef = doc(db, 'funds', id);
+    await updateDoc(fundRef, {
+      donorName: newDonorName.trim(),
+      amount: parseFloat(newAmount),
+      date: newDate,
+      description: newDescription.trim() || 'N/A'
+    });
+    alert('Fund record updated successfully!');
+    await loadFundsTable();
+  } catch (error) {
+    console.error('Error updating fund:', error);
+    alert('Unable to update this record. Please try again.');
+  }
 }
 
-function deleteFund(id) {
+async function deleteFund(id) {
   if (!actionsUnlocked) {
     alert('Please unlock the actions with the password before deleting.');
     return;
@@ -143,20 +171,21 @@ function deleteFund(id) {
     return;
   }
   
-  const funds = JSON.parse(localStorage.getItem('funds')) || [];
-  const filteredFunds = funds.filter(f => f.id !== id);
-  
-  // Save back to localStorage
-  localStorage.setItem('funds', JSON.stringify(filteredFunds));
-  
-  // Reload table
-  loadFundsTable();
-  
-  alert('Fund record deleted successfully!');
+  try {
+    await deleteDoc(doc(db, 'funds', id));
+    alert('Fund record deleted successfully!');
+    await loadFundsTable();
+  } catch (error) {
+    console.error('Error deleting fund:', error);
+    alert('Unable to delete this record. Please try again.');
+  }
 }
 
 // Helper function to escape HTML to prevent XSS
 function escapeHtml(text) {
+  if (typeof text !== 'string') {
+    return '';
+  }
   const map = {
     '&': '&amp;',
     '<': '&lt;',
@@ -169,7 +198,13 @@ function escapeHtml(text) {
 
 // Helper function to format date
 function formatDate(dateString) {
+  if (!dateString) {
+    return '-';
+  }
   const date = new Date(dateString + 'T00:00:00');
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
   return date.toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'short', 
@@ -197,4 +232,7 @@ function updateTotalFund(funds) {
   }, 0);
   totalAmountElement.textContent = formatCurrency(total);
 }
+
+window.editFund = editFund;
+window.deleteFund = deleteFund;
 

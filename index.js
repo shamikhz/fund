@@ -1,3 +1,18 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCrInzMyfWuDBxSK3SVGJq1gilxb4Z6Tfw",
+  authDomain: "fund-c9c9e.firebaseapp.com",
+  projectId: "fund-c9c9e",
+  storageBucket: "fund-c9c9e.firebasestorage.app",
+  messagingSenderId: "293603215710",
+  appId: "1:293603215710:web:b23d190fdd60e2d52527cf"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const fundsCollection = collection(db, 'funds');
 const ACCESS_PASSWORD = 'fundLock@123';
 
 // Handle fund form submission
@@ -40,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   if (fundForm) {
-    fundForm.addEventListener('submit', function(e) {
+    fundForm.addEventListener('submit', async function(e) {
       e.preventDefault();
 
       if (!formUnlocked) {
@@ -60,30 +75,22 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // Get existing funds from localStorage
-      let funds = JSON.parse(localStorage.getItem('funds')) || [];
-      
-      // Create new fund entry
-      const newFund = {
-        id: Date.now(), // Simple ID generation using timestamp
-        donorName: donorName,
-        amount: amount,
-        date: date,
-        description: description || 'N/A'
-      };
-      
-      // Add to array
-      funds.push(newFund);
-      
-      // Save to localStorage
-      localStorage.setItem('funds', JSON.stringify(funds));
-      
-      // Show success message
-      alert('Fund contribution submitted successfully!');
-      
-      // Reset form
-      fundForm.reset();
+      try {
+        await addDoc(fundsCollection, {
+          donorName,
+          amount,
+          date,
+          description: description || 'N/A',
+          createdAt: serverTimestamp()
+        });
+        alert('Fund contribution submitted successfully!');
+        fundForm.reset();
+      } catch (error) {
+        console.error('Error saving fund entry:', error);
+        alert('Unable to submit fund right now. Please try again.');
+      }
     });
   }
 });
+
 

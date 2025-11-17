@@ -3,54 +3,55 @@
 
 <head>
   <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=0.5">
-
-  <title>Masjid fund</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fund Collection - Taamir-e-Masjid Fund</title>
   <link rel="stylesheet" href="index.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
 </head>
 
 <body>
   <header class="glossy-header">
     <h1>Taamir-e-Masjid Fund</h1>
   </header>
-    <nav class="navbar">
-    <div class="nav-item"><a href="fund.html">Home</a></div>
-    <div class="nav-item"><a href="index.html">Submit Fund</a></div>
+  <nav class="navbar">
+    <div class="nav-item" id="fund"><a href="index.html">Collection</a></div>
+    <div class="nav-item"><a href="donation.html">Submit Fund</a></div>
   </nav>
-    <div class="container">
-    <form class="fund-form" id="fund-form">
-      <h2>Submit Fund Contribution</h2>
-      <div class="lock-panel">
-        <label for="form-password">Enter password to unlock form</label>
-        <div class="lock-controls">
-          <input type="password" id="form-password" placeholder="Password">
-          <button type="button" id="unlock-form-btn" class="lock-btn">Unlock</button>
-        </div>
-        <p class="lock-status" id="form-lock-status">Form is locked.</p>
+  <div class="total-summary">
+    <div class="total-title">Total Fund</div>
+    <div id="total-amount" class="total-amount">₹0.00</div>
+  </div>
+  <div class="lock-panel">
+    <label for="actions-password">Enter password to unlock actions</label>
+    <div class="lock-controls">
+      <input type="password" id="actions-password" placeholder="Password">
+      <button type="button" id="unlock-actions-btn" class="lock-btn">Unlock</button>
+    </div>
+    <p class="lock-status" id="actions-lock-status">Actions are locked.</p>
+  </div>
+  <div class="container">
+    <h2 style="text-align: center; color: #ee6b0e; margin: 20px 0;">Fund Collection Records</h2>
+    <div class="table-container">
+      <table class="fund-table" id="fund-table">
+        <thead>
+          <tr>
+            <th>Donor Name</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="fund-table-body">
+          <!-- Table rows will be populated by JavaScript -->
+        </tbody>
+      </table>
+      <div id="no-data-message" style="text-align: center; padding: 40px; color: #666; display: none;">
+        No fund records found. <a href="index.html">Submit your first contribution</a>
       </div>
-      <div class="form-group">
-        <label for="donor-name">Donor Name:</label>
-        <input type="text" id="donor-name" name="donorName" required>
-      </div>
-      <div class="form-group">
-        <label for="amount">Amount:</label>
-        <input type="number" id="amount" name="amount" step="0.01" min="0" required>
-      </div>
-      <div class="form-group">
-        <label for="date">Date:</label>
-        <input type="date" id="date" name="date" required>
-      </div>
-      <div class="form-group">
-        <label for="description">Description (Optional):</label>
-        <input type="text" id="description" name="description">
-      </div>
-      <div class="form-group">
-        <input type="submit" value="Submit Fund" class="submit-btn" id="submit-btn" disabled>
-      </div>
-    </form>
-    <script src="index.js"></script>
+    </div>
+  </div>
+  <script type="module" src="fund.js"></script>
 </body>
 
 </html>
+
